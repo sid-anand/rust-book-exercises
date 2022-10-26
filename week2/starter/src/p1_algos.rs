@@ -11,7 +11,13 @@
 ///
 /// Run `cargo test insort` to check your answers.
 pub fn insort(v: &mut Vec<i32>, n: i32) {
-  unimplemented!()
+  for i in 0..v.len() {
+    if n < v[i] {
+      v.insert(i, n);
+      return;
+    }
+  }
+  v.push(n);
 }
 
 type Node = i32;
@@ -31,7 +37,15 @@ type Node = i32;
 ///
 /// Run `cargo test connected` to check your answers.
 pub fn connected(edges: &[(&Node, &Node)], src: &Node, dst: &Node) -> bool {
-  unimplemented!()
+  if std::ptr::eq(src, dst) {
+    return true;
+  }
+  for (from, to) in edges {
+    if std::ptr::eq(src, *from) && connected(edges, *to, dst) {
+      return true;
+    }
+  }
+  return false;
 }
 
 #[cfg(test)]
