@@ -11,13 +11,13 @@
 ///
 /// Run `cargo test insort` to check your answers.
 pub fn insort(v: &mut Vec<i32>, n: i32) {
-  for i in 0..v.len() {
-    if n < v[i] {
-      v.insert(i, n);
-      return;
+    for i in 0..v.len() {
+        if n < v[i] {
+            v.insert(i, n);
+            return;
+        }
     }
-  }
-  v.push(n);
+    v.push(n);
 }
 
 type Node = i32;
@@ -37,40 +37,40 @@ type Node = i32;
 ///
 /// Run `cargo test connected` to check your answers.
 pub fn connected(edges: &[(&Node, &Node)], src: &Node, dst: &Node) -> bool {
-  if std::ptr::eq(src, dst) {
-    return true;
-  }
-  for (from, to) in edges {
-    if std::ptr::eq(src, *from) && connected(edges, *to, dst) {
-      return true;
+    if std::ptr::eq(src, dst) {
+        return true;
     }
-  }
-  return false;
+    for (from, to) in edges {
+        if std::ptr::eq(src, *from) && connected(edges, *to, dst) {
+            return true;
+        }
+    }
+    return false;
 }
 
 #[cfg(test)]
 mod test {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn insort_test() {
-    let mut v = vec![1, 5, 8];
+    #[test]
+    fn insort_test() {
+        let mut v = vec![1, 5, 8];
 
-    insort(&mut v, 0);
-    assert_eq!(v, vec![0, 1, 5, 8]);
+        insort(&mut v, 0);
+        assert_eq!(v, vec![0, 1, 5, 8]);
 
-    insort(&mut v, 3);
-    assert_eq!(v, vec![0, 1, 3, 5, 8]);
+        insort(&mut v, 3);
+        assert_eq!(v, vec![0, 1, 3, 5, 8]);
 
-    insort(&mut v, 9);
-    assert_eq!(v, vec![0, 1, 3, 5, 8, 9]);
-  }
+        insort(&mut v, 9);
+        assert_eq!(v, vec![0, 1, 3, 5, 8, 9]);
+    }
 
-  #[test]
-  fn connected_test() {
-    let nodes = vec![1, 1, 1];
-    let edges = vec![(&nodes[0], &nodes[1]), (&nodes[1], &nodes[2])];
-    assert!(connected(&edges, &nodes[0], &nodes[2]));
-    assert!(!connected(&edges, &nodes[2], &nodes[0]))
-  }
+    #[test]
+    fn connected_test() {
+        let nodes = vec![1, 1, 1];
+        let edges = vec![(&nodes[0], &nodes[1]), (&nodes[1], &nodes[2])];
+        assert!(connected(&edges, &nodes[0], &nodes[2]));
+        assert!(!connected(&edges, &nodes[2], &nodes[0]))
+    }
 }

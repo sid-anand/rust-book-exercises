@@ -12,25 +12,25 @@
 ///   * v: representing a collection of numbers
 /// and rounds every number in-place in v to the nearest integer.
 pub fn round_all(
-  // (1) v could be a Vec<_>, &Vec<_>, &mut Vec<_>, &[_], or &mut[_]. I choose &mut[_] because
-  //     we do not need to change the size or order of the collection, but do need to change the elements.
-  // (2) v could be a &mut [{number type}], and "round to the nearest integer" implies the use of floats.
-  // (3) The choice of f32 vs. f64 is arbitrary -- we would need to use more advanced features to write one
-  //     function that works for both types, so we arbitrarily pick f32 for now.
-  v: &mut [f32],
+    // (1) v could be a Vec<_>, &Vec<_>, &mut Vec<_>, &[_], or &mut[_]. I choose &mut[_] because
+    //     we do not need to change the size or order of the collection, but do need to change the elements.
+    // (2) v could be a &mut [{number type}], and "round to the nearest integer" implies the use of floats.
+    // (3) The choice of f32 vs. f64 is arbitrary -- we would need to use more advanced features to write one
+    //     function that works for both types, so we arbitrarily pick f32 for now.
+    v: &mut [f32],
 )
 // No return value, since this function only mutates an input.
 {
-  for n in v.iter_mut() {
-    *n = n.round();
-  }
+    for n in v.iter_mut() {
+        *n = n.round();
+    }
 }
 
 #[test]
 fn round_all_test() {
-  let mut v = vec![0.3, 0.7];
-  round_all(&mut v);
-  assert_eq!(v, vec![0., 1.]);
+    let mut v = vec![0.3, 0.7];
+    round_all(&mut v);
+    assert_eq!(v, vec![0., 1.]);
 }
 
 // Now you try!
@@ -41,15 +41,33 @@ fn round_all_test() {
 /// and returns a value:
 ///   * representing which strings in the collection contain the needle
 pub fn find_contains(
-  /* Pick and justify your parameters */
-) -> () /* Pick and justify your return type */
+    // don't need to be able to change the size, order, or elements of the collection
+    haystack: &[String],
+    needle: &str,
+) -> Vec<usize>
+// want to be able to add elements one at a time, so it should be a vector
 {
-  unimplemented!();
+    let mut v: Vec<usize> = vec![];
+    for (i, s) in haystack.iter().enumerate() {
+        if s.contains(needle) {
+            v.push(i);
+        }
+    }
+    v
 }
 
 #[test]
 fn find_contains_test() {
-  /* Add your unit test here! */
+    /* Add your unit test here! */
+    let haystack = vec![
+        String::from("abc"),
+        String::from("def"),
+        String::from("ghi"),
+        String::from("cbc"),
+    ];
+    let needle = "bc";
+    let out = find_contains(&haystack, needle);
+    assert_eq!(out, vec![0, 3]);
 }
 
 /// P2b: fill_progress_bar is a function that takes:
@@ -59,14 +77,12 @@ fn find_contains_test() {
 /// Then places a textual representation of the progress bar into `buf`.
 /// For example, at a progress of 20% with bracketed delimiters, the bar would be:
 ///   [==        ]
-pub fn fill_progress_bar(
-  /* Pick and justify your parameters */
-) -> () /* Pick and justify your return type */
+pub fn fill_progress_bar(buf: &String, delims: &str, frac: usize) -> () /* Pick and justify your return type */
 {
-  unimplemented!();
+    unimplemented!();
 }
 
 #[test]
 fn test_fill_progress_bar() {
-  /* Add your unit test here! */
+    /* Add your unit test here! */
 }
