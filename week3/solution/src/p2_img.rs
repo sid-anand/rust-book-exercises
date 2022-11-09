@@ -106,8 +106,33 @@ pub struct Image {
     height: usize,
 }
 
+pub struct Matrix {
+    data: Vec<usize>,
+    width: usize,
+}
+impl Matrix {
+    fn new(width: usize, height: usize) -> Self {
+        Matrix {
+            data: vec![0; width * height],
+            width,
+        }
+    }
+
+    fn get(&self, x: usize, y: usize) -> usize {
+        self.data[x + y * self.width]
+    }
+
+    fn set(&mut self, x: usize, y: usize, value: usize) {
+        self.data[x + y * self.width] = value;
+    }
+
+    fn row_slice(&self, x1: usize, x2: usize, y: usize) -> &[usize] {
+        &self.data[(x1 + (y * self.width))..=(x2 + (y * self.width))]
+    }
+}
+
 /// Data structure to hold energies.
-type Energies = HashMap<(usize, usize), usize>;
+type Energies = Matrix;
 
 impl Image {
     pub fn get(&self, x: usize, y: usize) -> u8 {
@@ -125,22 +150,29 @@ impl Image {
             .then_some((x2 as usize, y2 as usize))
     }
 
+
     /// Generates the initial mapping from pixels to energy. The initial energy of a pixel
     /// is the average difference of the pixel versus its neighbors.
     pub fn compute_initial_energy(&self) -> Energies {
-        let mut energies = HashMap::new();
+        // Use a vector representation of energy instead of a hashmap
+        let mut energies = Matrix::new(self.width, self.height);
 
         for y in 0..self.height {
             for x in 0..self.width {
-                let mut diffs = Vec::new();
+                let mut diff_sum = 0;
+                let mut diff_count = 0;
+                // Only compute self.get(x, y) once
+                let px = self.get(x, y);
                 for dy in -1..=1 {
                     for dx in -1..=1 {
                         if let Some((x2, y2)) = self.offset(x, y, dx, dy) {
-                            diffs.push(self.get(x, y).abs_diff(self.get(x2, y2)) as usize);
+                            // Don't accumulate a vector of differences
+                            diff_sum += px.abs_diff(self.get(x2, y2)) as usize;
+                            diff_count += 1;
                         }
                     }
                 }
-                energies.insert((x, y), diffs.iter().sum::<usize>() / diffs.len());
+                energies.set(x, y, diff_sum / diff_count);
             }
         }
 
@@ -151,14 +183,18 @@ impl Image {
     ///
     /// Increments energies(x, y) by the minimum of its three neighbors above.
     pub fn propagate_energy(&self, energies: &mut Energies) {
-        for y in 0..self.height {
+        for y in 1..self.height {
             for x in 0..self.width {
-                let emin = (-1..=1)
-                    .filter_map(|dx| self.offset(x, y, dx, -1))
-                    .map(|(x, y)| energies[&(x, y)])
-                    .min()
-                    .unwrap_or(0);
-                *energies.get_mut(&(x, y)).unwrap() += emin;
+                // Directly handle the edge cases rather than using .offset
+                let range = if x == 0 {
+                    energies.row_slice(x, x + 1, y - 1)
+                } else if x == self.width - 1 {
+                    energies.row_slice(x - 1, x, y - 1)
+                } else {
+                    energies.row_slice(x - 1, x + 1, y - 1)
+                };
+                let emin = range.iter().copied().min().unwrap_or(0);
+                energies.set(x, y, energies.get(x, y) + emin);
             }
         }
     }
@@ -166,15 +202,16 @@ impl Image {
     /// Finds the lowest-energy seam by starting at the bottom, and following the
     /// smallest adjacent energy values.
     pub fn find_seam(&self, energies: &Energies) -> Vec<usize> {
+        // No significant changes, just using the alternative `energies` interface
         let (y_seed, _) = (0..self.width)
-            .map(|x| (x, energies[&(x, self.height - 1)]))
+            .map(|x| (x, energies.get(x, self.height - 1)))
             .min_by_key(|(_, e)| *e)
             .unwrap();
         let mut min_seam = vec![y_seed];
         for y in 0..(self.height - 1) {
             let (x, _) = (-1..=1)
                 .filter_map(|dx| self.offset(min_seam[y], self.height - y - 1, dx, -1))
-                .map(|(x2, y2)| (x2, energies[&(x2, y2)]))
+                .map(|(x2, y2)| (x2, energies.get(x2, y2)))
                 .min_by_key(|(_, e)| *e)
                 .unwrap();
             min_seam.push(x);
@@ -231,5 +268,20 @@ impl Image {
             }
         }
         img.save(path)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn img_test() {
+        let mut img = Image::load("input.jpg").unwrap();
+
+        for _ in 0..50 {
+            img = img.carve();
+        }
+
+        img.save("output.jpg").unwrap();
     }
 }
