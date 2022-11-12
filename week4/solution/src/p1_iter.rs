@@ -79,7 +79,6 @@ impl<T: Iterator> IntoCartesianProduct for T {
     }
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;

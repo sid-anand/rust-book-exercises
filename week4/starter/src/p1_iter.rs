@@ -29,8 +29,57 @@
 //! To get you started, I would read Rust's documentation on how to implement an iterator:
 //! https://doc.rust-lang.org/std/iter/index.html#implementing-iterator
 
-
 // Your implementation goes here!
+
+// CartesianProduct struct and Iterator implementation for it
+// IntoCartesianProduct trait
+// impl of IntroCartesianProduct for all Iterator
+
+struct CartesianProduct<A, B> {
+    v1: Vec<A>,
+    v2: Vec<B>,
+    i1: usize,
+    i2: usize,
+}
+
+impl<A, B> Iterator for CartesianProduct<A, B>
+where
+    A: Clone,
+    B: Clone,
+{
+    type Item = (A, B);
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.i1 == self.v1.len() {
+            return None;
+        }
+
+        let p = (self.v1[self.i1].clone(), self.v2[self.i2].clone());
+
+        if self.i2 == self.v2.len() - 1 {
+            self.i1 += 1;
+            self.i2 = 0;
+        } else {
+            self.i2 += 1;
+        }
+
+        Some(p)
+    }
+}
+
+trait IntoCartesianProduct: Iterator {
+    fn cartesian_product<V: Iterator>(self, other: V) -> CartesianProduct<Self::Item, V::Item>;
+}
+
+impl<T: Iterator> IntoCartesianProduct for T {
+    fn cartesian_product<V: Iterator>(self, other: V) -> CartesianProduct<Self::Item, V::Item> {
+        CartesianProduct {
+            v1: self.collect(),
+            v2: other.collect(),
+            i1: 0,
+            i2: 0,
+        }
+    }
+}
 
 #[cfg(test)]
 mod test {

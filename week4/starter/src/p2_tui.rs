@@ -23,6 +23,10 @@
 //! cargo test container -- --nocapture
 //! ```
 
+// Element trait with dimensions and render methods
+// structs for Text, Heading, and Container, with new methods to construct them
+// impl of the Element trait for each struct
+// SOMEHOW need to simulate Heading's inheritance of Text's field, constructor, and dimensions method
 
 #[cfg(test)]
 mod test {
