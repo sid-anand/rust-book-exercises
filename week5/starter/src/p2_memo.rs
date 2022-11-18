@@ -15,23 +15,22 @@
 //! * While `Memo::call` may mutate its interior state, a user of `Memo` should not have to
 //!   care about that mutability -- `Memo::call` should work even if `Memo` is outwardly immutable.
 //!   Consider a `RefCell`!
-//! 
+//!
 //! * If you store a collection of outputs in the cache, remember that mutations to collections
 //!   can cause them to reallocate (e.g. `Vec::push`, `HashMap::insert`, etc.). So any *direct*
 //!   references to collection items will be invalidated. Take a look at the Pin data structure:
 //!   <https://doc.rust-lang.org/std/pin/index.html>
-//! 
+//!
 //! * You may need to convince Rust that a variable lives longer than its given lifetime.
 //!   You can use the unsafe operation [`mem::transmute`](https://doc.rust-lang.org/std/mem/fn.transmute.html)
 //!   for this. But beware! Only use `transmute` with the utmost caution!
-//! 
+//!
 //! Note that there is a unit test `memo_scope_test` that is commented out. It *should not compile*.
 //! So you can try commenting it in, and verifying that you get a compiler error.
 
-
 pub struct Memo<Func, Input, Output> {
     func: Func,
-    cache: () // TODO
+    cache: (), // TODO
 }
 
 impl<Func, Input, Output> Memo<Func, Input, Output>
@@ -41,15 +40,13 @@ where
     pub fn new(func: Func) -> Self {
         Memo {
             func,
-            cache: () // TODO
+            cache: (), // TODO
         }
     }
-
 
     pub fn call() {} // TODO
 }
 /* END SOLUTION */
-
 #[cfg(test)]
 mod test {
     use super::*;
